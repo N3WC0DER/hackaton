@@ -26,7 +26,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-              "cd hackaton && \
+              "cd ~/hackaton && \
                git fetch origin pull/$PR_NUMBER/head:pr-$PR_NUMBER && \
                git checkout pr-$PR_NUMBER && \
                docker-compose down && \
