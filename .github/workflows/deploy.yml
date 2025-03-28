@@ -1,0 +1,41 @@
+name: Deploy on Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up environment variables
+        run: |
+          echo "BRANCH_NAME=$(echo $GITHUB_HEAD_REF | tr / -)" >> $GITHUB_ENV
+          echo "PR_NUMBER=${{ github.event.number }}" >> $GITHUB_ENV
+
+      - name: Deploy to server via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              "cd /path/to/deploy/directory && \
+               git fetch origin pull/$PR_NUMBER/head:pr-$PR_NUMBER && \
+               git checkout pr-$PR_NUMBER && \
+               docker-compose down && \
+               docker-compose up -d --build"
+
+      - name: Notify about deployment
+        run: |
+          curl -X POST \
+               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Content-Type: application/json" \
+               -d '{"body": "Приложение развёрнуто на сервере для тестирования. Доступно по ссылке: http://${{ secrets.SSH_HOST }}/pr-$PR_NUMBER"}' \
+               "${{ github.event.pull_request.comments_url }}"
