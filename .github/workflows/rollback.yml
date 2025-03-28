@@ -11,4 +11,4 @@ jobs:
       - name: Remove deployment
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-              "rm -rf /path/to/deploy/pr-${{ github.event.number }}"
+              "rm -rf ~/hackaton/pr-${{ github.event.number }}"
