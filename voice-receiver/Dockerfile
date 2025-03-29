@@ -4,6 +4,11 @@ FROM python:3.9-slim
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
+# Устанавливаем ffmpeg и зависимости
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
+
 # Обновляем pip
 RUN pip install --upgrade pip
 

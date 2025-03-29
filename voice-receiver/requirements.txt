@@ -1,3 +1,7 @@
 kafka-python
 dotenv
 boto3
+psycopg2-binary
+requests
+pydub
+wave
